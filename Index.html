@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Full Featured Blog</title>
+
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+<!-- Optional: Include icons library -->
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+
+<!-- Custom CSS -->
+<style>
+/* Custom animations and tweaks */
+.fade-in { animation: fadeIn 0.5s ease-in-out; }
+@keyframes fadeIn { from {opacity:0;} to {opacity:1;} }
+
+.card-hover:hover { transform: translateY(-5px); box-shadow:0 10px 20px rgba(0,0,0,0.2); transition: all 0.3s ease; }
+.dark-mode { background-color:#1f2937; color:#f3f4f6; }
+</style>
+</head>
+<body class="bg-gray-100 text-gray-800 transition-colors duration-300">
+
+<!-- NAVIGATION -->
+<nav class="bg-gray-800 text-white p-4 flex justify-between items-center sticky top-0 z-50">
+  <div class="text-xl font-bold">My Blog</div>
+  <ul class="flex space-x-4">
+    <li><button id="nav-home">Home</button></li>
+    <li><button id="nav-login">Login</button></li>
+    <li><button id="nav-register">Register</button></li>
+    <li><button id="nav-admin">Admin</button></li>
+    <li><button id="dark-toggle" class="bg-gray-700 px-3 py-1 rounded">Dark Mode</button></li>
+  </ul>
+</nav>
+
+<!-- MAIN CONTENT -->
+<main class="p-4 max-w-6xl mx-auto">
+
+  <!-- HOME PAGE -->
+  <section id="home-page" class="fade-in">
+    <h1 class="text-3xl font-bold mb-4">Featured Posts</h1>
+    <div class="grid md:grid-cols-3 gap-6" id="posts-container"></div>
+
+    <!-- Search -->
+    <div class="mt-6 flex space-x-2">
+      <input type="text" id="search-input" placeholder="Search blogs..." class="flex-1 p-2 border rounded"/>
+      <button id="search-btn" class="bg-blue-600 text-white px-4 rounded hover:bg-blue-700">Search</button>
+    </div>
+  </section>
+
+  <!-- LOGIN PAGE -->
+  <section id="login-page" class="fade-in hidden">
+    <h2 class="text-2xl font-bold mb-4">Login</h2>
+    <form id="login-form" class="flex flex-col space-y-3 max-w-md">
+      <input type="text" id="username" placeholder="Username" class="p-2 border rounded" required/>
+      <input type="password" id="password" placeholder="Password" class="p-2 border rounded" required/>
+      <button type="submit" class="bg-green-600 text-white p-2 rounded hover:bg-green-700">Login</button>
+    </form>
+    <p id="login-msg" class="mt-2 text-red-500"></p>
+  </section>
+
+  <!-- REGISTER PAGE -->
+  <section id="register-page" class="fade-in hidden">
+    <h2 class="text-2xl font-bold mb-4">Register</h2>
+    <form id="register-form" class="flex flex-col space-y-3 max-w-md">
+      <input type="text" id="reg-username" placeholder="Username" class="p-2 border rounded" required/>
+      <input type="email" id="reg-email" placeholder="Email" class="p-2 border rounded" required/>
+      <input type="password" id="reg-password" placeholder="Password" class="p-2 border rounded" required/>
+      <button type="submit" class="bg-blue-600 text-white p-2 rounded hover:bg-blue-700">Register</button>
+    </form>
+    <p id="register-msg" class="mt-2 text-red-500"></p>
+  </section>
+
+  <!-- SINGLE POST PAGE -->
+  <section id="post-page" class="fade-in hidden">
+    <h1 id="post-title" class="text-3xl font-bold mb-2">Blog Title</h1>
+    <p id="post-body" class="mb-4">Full blog content...</p>
+
+    <div>
+      <h2 class="text-2xl font-semibold mb-2">Comments</h2>
+      <div id="comments-container" class="space-y-2 mb-4"></div>
+      <textarea id="comment-input" placeholder="Add a comment..." class="w-full p-2 border rounded mb-2"></textarea>
+      <button id="comment-btn" class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">Submit Comment</button>
+    </div>
+  </section>
+
+  <!-- ADMIN DASHBOARD -->
+  <section id="admin-page" class="fade-in hidden">
+    <h2 class="text-2xl font-bold mb-4">Admin Dashboard</h2>
+    <div class="grid md:grid-cols-3 gap-6">
+      <div class="p-4 bg-white rounded shadow card-hover"><h3 class="font-bold">Total Posts</h3><p id="total-posts">0</p></div>
+      <div class="p-4 bg-white rounded shadow card-hover"><h3 class="font-bold">Total Comments</h3><p id="total-comments">0</p></div>
+      <div class="p-4 bg-white rounded shadow card-hover"><h3 class="font-bold">Total Users</h3><p id="total-users">0</p></div>
+    </div>
+  </section>
+
+</main>
+
+<!-- JS -->
+<script>
+// Dark Mode Toggle
+const body = document.body;
+document.getElementById('dark-toggle').addEventListener('click', () => {
+  body.classList.toggle('dark-mode');
+});
+
+// Page Navigation
+const pages = {
+  home: document.getElementById('home-page'),
+  login: document.getElementById('login-page'),
+  register: document.getElementById('register-page'),
+  post: document.getElementById('post-page'),
+  admin: document.getElementById('admin-page')
+};
+function hideAll() { Object.values(pages).forEach(p => p.classList.add('hidden')); }
+
+document.getElementById('nav-home').addEventListener('click', ()=>{hideAll(); pages.home.classList.remove('hidden');});
+document.getElementById('nav-login').addEventListener('click', ()=>{hideAll(); pages.login.classList.remove('hidden');});
+document.getElementById('nav-register').addEventListener('click', ()=>{hideAll(); pages.register.classList.remove('hidden');});
+document.getElementById('nav-admin').addEventListener('click', ()=>{hideAll(); pages.admin.classList.remove('hidden');});
+
+// Sample Posts Data
+let posts = [
+  {title:"Learning JavaScript", summary:"An introduction to JS concepts.", comments:[]},
+  {title:"CSS Grid Tutorial", summary:"Build responsive layouts easily.", comments:[]},
+  {title:"Tailwind CSS Guide", summary:"Quickly style your website with Tailwind.", comments:[]},
+];
+
+// Display Posts
+const postsContainer = document.getElementById('posts-container');
+function displayPosts(arr) {
+  postsContainer.innerHTML = '';
+  arr.forEach((p, idx) => {
+    const div = document.createElement('div');
+    div.className = "bg-white p-4 rounded shadow card-hover";
+    div.innerHTML = `<h3 class="font-bold text-xl mb-2">${p.title}</h3><p>${p.summary}</p><button class="mt-2 bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700" data-idx="${idx}">Read More</button>`;
+    postsContainer.appendChild(div);
+    div.querySelector('button').addEventListener('click', ()=>{
+      hideAll();
+      pages.post.classList.remove('hidden');
+      document.getElementById('post-title').textContent = p.title;
+      document.getElementById('post-body').textContent = p.summary + " (Full content goes here...)";
+      displayComments(p);
+    });
+  });
+}
+displayPosts(posts);
+
+// Search Functionality
+document.getElementById('search-btn').addEventListener('click', ()=>{
+  const query = document.getElementById('search-input').value.toLowerCase();
+  displayPosts(posts.filter(p => p.title.toLowerCase().includes(query)));
+});
+
+// Comments
+let currentPost = null;
+function displayComments(post){
+  currentPost = post;
+  const container = document.getElementById('comments-container');
+  container.innerHTML = '';
+  post.comments.forEach(c => {
+    const div = document.createElement('div');
+    div.className = "bg-gray-200 p-2 rounded";
+    div.textContent = `${c.user}: ${c.text}`;
+    container.appendChild(div);
+  });
+}
+document.getElementById('comment-btn').addEventListener('click', ()=>{
+  const input = document.getElementById('comment-input');
+  if(currentPost && input.value.trim() !== ''){
+    currentPost.comments.push({user:"Guest", text:input.value});
+    input.value='';
+    displayComments(currentPost);
+    updateAdminStats();
+  }
+});
+
+// Front-End Login/Register
+document.getElementById('login-form').addEventListener('submit', e=>{
+  e.preventDefault();
+  document.getElementById('login-msg').textContent = "Login successful! (Front-end only)";
+});
+document.getElementById('register-form').addEventListener('submit', e=>{
+  e.preventDefault();
+  document.getElementById('register-msg').textContent = "Registration successful! (Front-end only)";
+  updateAdminStats();
+});
+
+// Admin Dashboard Stats
+function updateAdminStats(){
+  document.getElementById('total-posts').textContent = posts.length;
+  document.getElementById('total-comments').textContent = posts.reduce((sum,p)=>sum+p.comments.length,0);
+  document.getElementById('total-users').textContent = 5; // Example static number
+}
+updateAdminStats();
+</script>
+</body>
+</html>
